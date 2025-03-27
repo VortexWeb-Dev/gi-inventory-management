@@ -5,10 +5,10 @@ const PropertyCard = ({ property }) => {
   const [mainImage, setMainImage] = useState(property.images[0]);
 
   return (
-    <div className="max-w-full mx-auto bg-white rounded-2xl shadow-md overflow-hidden flex">
+    <div className="max-w-full mx-auto h-[35vh] bg-white rounded-2xl shadow-md overflow-hidden flex">
       {/* Image Section (42% width) */}
       <div className="w-[42%] relative">
-        <img src={mainImage} alt="Property" className="w-full h-full object-cover" />
+        <img src={mainImage} alt="Property" className="w-[100%] h-[100%] object-cover" />
         {property.checked && (
           <div className="absolute top-2 left-2 bg-green-500 text-white text-xs font-semibold px-2 py-1 rounded">
             ✔ Checked
