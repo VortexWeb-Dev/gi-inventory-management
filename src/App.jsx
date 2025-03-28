@@ -1,6 +1,5 @@
 import './App.css'
 import Listing from './Listing'
-import propertiesData from './mockData/propertyData'
 import { BrowserRouter } from 'react-router-dom'
 function App() {
 
@@ -17,8 +16,8 @@ function App() {
         <div className="w-60 h-1 bg-gradient-to-r from-blue-300 to-blue-500 rounded-full"></div>
       </div>
     </div>
-    {/* <div className='text-green-400 text-4xl'>hbsbdhvsa</div> */}
-    <Listing propertiesData={propertiesData}/>
+
+    <Listing/>
 
     </>
     </BrowserRouter>

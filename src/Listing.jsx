@@ -65,13 +65,13 @@ const Listing = () => {
         {propertiesData && (propertiesData.length > 0)? (
           <div>
             <div className="w-full flex justify-center py-4">
-              {/* Assuming Searchbar is defined elsewhere */}
-              <Searchbar
+           
+              {/* <Searchbar
                 searchTerm={searchTerm}
                 setSearchTerm={setSearchTerm}
-              />
+              /> */}
             </div>
-            <div className="max-w-5xl mx-auto p-6">
+            <div className="max-w-5xl mx-auto px-6">
               <div className="bg-gray-50/50 rounded-xl p-6 backdrop-blur-sm">
                 <div className="space-y-4">
                   {currentFilteredData.length > 0 ? (

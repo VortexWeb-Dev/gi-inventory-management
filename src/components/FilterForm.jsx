@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, Bed, Bath, Home, ListChecks } from 'lucide-react';
+import { Search, Bed, Bath, Home, ListChecks, Building, House, PersonStanding } from 'lucide-react';
 
 const RangeFilter = ({ label, fromValue, toValue, onFromChange, onToChange, onClose }) => {
     return (
@@ -32,11 +32,17 @@ const RangeFilter = ({ label, fromValue, toValue, onFromChange, onToChange, onCl
 const FilterBar = ({filteredData,setFilteredData}) => {
 
 const savedFilteredData = useRef(null); 
-
+const hasRun = useRef(false);
 
     useEffect(()=>{
-        savedFilteredData.current = filteredData
-    },[])
+        if (hasRun.current || filteredData.length === 0) return;
+        
+            savedFilteredData.current = filteredData
+            hasRun.current = true;
+            console.log("savedFilteredData: ", savedFilteredData)
+
+        
+    },[filteredData])
 
   const [filters, setFilters] = useState({
     agentName: '',
@@ -45,6 +51,9 @@ const savedFilteredData = useRef(null);
     bathrooms: '',
     unitType: '',
     status: '',
+    comm: '',
+    subComm: '',
+    building: ''
     // price: null,
     // size: null
   });
@@ -67,20 +76,79 @@ const savedFilteredData = useRef(null);
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleFilterClick = () => {
-    // console.log('Filters:', filters);
+//   const handleFilterClick = () => {
+//     // console.log('Filters:', filters);
 
+//     const newFilteredData = filteredData.filter(item =>
+//         Object.entries(filters).every(([key, value]) => {
+//             // Only filter by fields that have a non-empty, non-null value
+//             if (value !== '' && value !== null) {
+//                 return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
+//             }
+//             return true;
+//         })
+//     );
+
+//     // console.log('Filtered Data:', newFilteredData);
+//     setFilteredData(newFilteredData);
+// };
+
+function processLocations(locationPf, locationBayut) {
+    // Split both strings by " - "
+    let pfParts = locationPf.split(" - ");
+    let bayutParts = locationBayut.split(" - ");
+    
+    let result = [];
+    
+    // First element: first part of both
+    result.push(`${pfParts[0]} ${bayutParts[0]}`);
+    
+    // Second element: second part of both
+    result.push(`${pfParts[1] || ''} ${bayutParts[1] || ''}`.trim());
+    
+    // Third element: remaining middle part of bayut excluding already used ones in pf
+    let remainingBayutParts = bayutParts.slice(2, -1);
+    let remainingPfParts = pfParts.slice(2, -1);
+    let middlePart = [...remainingPfParts, ...remainingBayutParts].join(" ");
+    result.push(middlePart);
+    
+    // Fourth element: last part of both
+    result.push(`${pfParts.at(-1)} ${bayutParts.at(-1)}`);
+    
+    return result;
+}
+
+
+const handleFilterClick = () => {
     const newFilteredData = filteredData.filter(item =>
         Object.entries(filters).every(([key, value]) => {
-            // Only filter by fields that have a non-empty, non-null value
             if (value !== '' && value !== null) {
-                return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
+                if (["comm", "subComm", "building"].includes(key)) {
+                    const locationData = processLocations(item.locationPf, item.locationBayut);
+                    // console.log(locationData)
+                    const lowerValue = value.toString().toLowerCase();
+                    // console.log(key)
+                    // console.log(lowerValue)
+                    
+                    if (key === "comm") {
+                        return locationData[1]?.toString().toLowerCase().includes(lowerValue);
+                    } else if (key === "subComm") {
+                        if (locationData[3] && locationData[2] != '') {
+                            return locationData[2].toString().toLowerCase().includes(lowerValue);
+                        } else {
+                            return locationData[1]?.toString().toLowerCase().includes(lowerValue);
+                        }
+                    } else if (key === "building") {
+                        return locationData[3]?.toString().toLowerCase().includes(lowerValue);
+                    }
+                } else {
+                    return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
+                }
             }
             return true;
         })
     );
 
-    // console.log('Filtered Data:', newFilteredData);
     setFilteredData(newFilteredData);
 };
 
@@ -94,6 +162,9 @@ const savedFilteredData = useRef(null);
       bathrooms: '',
       unitType: '',
       status: '',
+      comm: '',
+      subComm: '',
+      building: ''
     //   priceFrom: '',
     //   priceTo: '',
     //   sizeFrom: '',
@@ -105,162 +176,66 @@ const savedFilteredData = useRef(null);
   };
 
   return (
-    <div className="p-4 w-[100%]">
-      <div className="bg-white bg-opacity-10 rounded-xl shadow-md p-4 flex items-center space-x-4 backdrop-filter backdrop-blur-lg w-[120%] pr-64">
-        <div className="flex items-center space-x-2">
-          <Search className="text-blue-300" />
+    <div className="flex justify-center px-4 py-2 w-full">
+    <div className="bg-white bg-opacity-10 rounded-xl shadow-md p-6 flex flex-wrap justify-center gap-4 backdrop-filter backdrop-blur-lg w-full max-w-4xl">
+      {[
+        { name: "agentName", placeholder: "Agents", Icon: Search },
+        { name: "ownerName", placeholder: "Owners", Icon: Search },
+        { name: "comm", placeholder: "Community", Icon: House },
+        { name: "subComm", placeholder: "Sub Community", Icon: PersonStanding },
+        { name: "building", placeholder: "Building", Icon: Building },
+      ].map(({ name, placeholder, Icon }) => (
+        <div key={name} className="flex items-center space-x-2 w-56">
+          <Icon className="text-blue-300" />
           <input
             type="text"
-            name="agentName"
-            value={filters.agentName}
+            name={name}
+            value={filters[name]}
             onChange={handleInputChange}
-            placeholder="Agents"
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 placeholder-blue-300 focus:outline-none focus:border-blue-400"
+            placeholder={placeholder}
+            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 placeholder-blue-300 focus:outline-none focus:border-blue-400 w-full"
           />
         </div>
-        <div className="flex items-center space-x-2">
-          <Search className="text-blue-300" />
-          <input
-            type="text"
-            name="ownerName"
-            value={filters.ownerName}
-            onChange={handleInputChange}
-            placeholder="Owners"
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 placeholder-blue-300 focus:outline-none focus:border-blue-400"
-          />
-        </div>
-        <div className="flex items-center space-x-2">
-          <Bed className="text-blue-300" />
+      ))}
+      {[
+        { name: "bedrooms", label: "Beds", Icon: Bed, options: [0, 1, 2, 3, 4, 5] },
+        { name: "bathrooms", label: "Baths", Icon: Bath, options: [0, 1, 2, 3, 4, 5] },
+        { name: "unitType", label: "Unit Type", Icon: Home, options: ["Apartment", "Villa", "Short Term / Hotel Apartment"] },
+        { name: "status", label: "Status", Icon: ListChecks, options: ["Published", "Pocketed"] },
+      ].map(({ name, label, Icon, options }) => (
+        <div key={name} className="flex items-center space-x-2 w-56">
+          <Icon className="text-blue-300" />
           <select
-            name="bedrooms"
-            value={filters.bedrooms}
+            name={name}
+            value={filters[name]}
             onChange={handleInputChange}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
+            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400 w-full"
           >
-            <option value="">Beds</option>
-            {[0, 1, 2, 3, 4, 5].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
+            <option value="">{label}</option>
+            {options.map((option) => (
+              <option key={option} value={option}>{option}</option>
             ))}
           </select>
         </div>
-        <div className="flex items-center space-x-2">
-          <Bath className="text-blue-300" />
-          <select
-            name="bathrooms"
-            value={filters.bathrooms}
-            onChange={handleInputChange}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
-          >
-            <option value="">Baths</option>
-            {[0, 1, 2, 3, 4, 5].map((num) => (
-              <option key={num} value={num}>
-                {num}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Home className="text-blue-300" />
-          <select
-            name="unitType"
-            value={filters.unitType}
-            onChange={handleInputChange}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
-          >
-            <option value="">Unit Type</option>
-            <option value="Apartment">Apartment</option>
-            <option value="Villa">Villa</option>
-            <option value="Short Term / Hotel Apartment">
-              Short Term / Hotel Apartment
-            </option>
-          </select>
-        </div>
-        <div className="flex items-center space-x-2">
-          <ListChecks className="text-blue-300" />
-          <select
-            name="status"
-            value={filters.status}
-            onChange={handleInputChange}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
-          >
-            <option value="">Status</option>
-            <option value="Published">Published</option>
-            <option value="Pocketed">Pocketed</option>
-          </select>
-        </div>
-
-        {/* <div className="relative">
-          <button
-            onClick={() => setShowPriceFilter(!showPriceFilter)}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
-          >
-            Price
-          </button>
-          {showPriceFilter && (
-            <RangeFilter
-              label="Price"
-              fromValue={filters.priceFrom}
-              toValue={filters.priceTo}
-              onFromChange={(value) => setFilters({ ...filters, priceFrom: value })}
-              onToChange={(value) => setFilters({ ...filters, priceTo: value })}
-              onClose={() => setShowPriceFilter(false)}
-            />
-          )}
-          {(filters.priceFrom || filters.priceTo) && (
-            <div className="flex items-center mt-2">
-              <span>Price: {filters.priceFrom || 'Any'} - {filters.priceTo || 'Any'}</span>
-              <button onClick={clearPriceFilter} className="ml-2 text-red-500">
-                x
-              </button>
-            </div>
-          )}
-        </div>
-        <div className="relative">
-          <button
-            onClick={() => setShowSizeFilter(!showSizeFilter)}
-            className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400"
-          >
-            Size
-          </button>
-          {showSizeFilter && (
-            <RangeFilter
-              label="Size"
-              fromValue={filters.sizeFrom}
-              toValue={filters.sizeTo}
-              onFromChange={(value) => setFilters({ ...filters, sizeFrom: value })}
-              onToChange={(value) => setFilters({ ...filters, sizeTo: value })}
-              onClose={() => setShowSizeFilter(false)}
-            />
-          )}
-          {(filters.sizeFrom || filters.sizeTo) && (
-            <div className="flex items-center mt-2">
-              <span>Size: {filters.sizeFrom || 'Any'} - {filters.sizeTo || 'Any'}</span>
-              <button onClick={clearSizeFilter} className="ml-2 text-red-500">
-                x
-              </button>
-            </div>
-          )}
-        </div> */}
-
+      ))}
+      <div className="flex justify-center gap-4 w-full">
         <button
           type="button"
           onClick={handleFilterClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 text-xl rounded-md"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 text-lg rounded-md"
         >
           Filter
         </button>
-
         <button
           type="button"
           onClick={handleReset}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-5 text-xl rounded-md"
+          className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 text-lg rounded-md"
         >
           Reset
         </button>
       </div>
     </div>
+  </div>
   );
 };
 
