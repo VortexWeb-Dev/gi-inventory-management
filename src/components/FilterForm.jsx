@@ -120,7 +120,7 @@ function processLocations(locationPf, locationBayut) {
 
 
 const handleFilterClick = () => {
-    const newFilteredData = filteredData.filter(item =>
+    const newFilteredData = savedFilteredData.current.filter(item =>
         Object.entries(filters).every(([key, value]) => {
             if (value !== '' && value !== null) {
                 if (["comm", "subComm", "building"].includes(key)) {
