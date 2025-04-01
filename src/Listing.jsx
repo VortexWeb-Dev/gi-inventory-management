@@ -4,7 +4,6 @@ import Searchbar from "./components/SearchBar";
 import Pagination from "./Pagination";
 import fetchAllData from "./utils/fetchAllData";
 import FilterForm from "./components/FilterForm";
-// import axios from 'axios';
 
 const Listing = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,13 +65,9 @@ const Listing = () => {
           <div>
             <div className="w-full flex justify-center py-4">
            
-              {/* <Searchbar
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
-              /> */}
             </div>
-            <div className="max-w-5xl mx-auto px-6">
-              <div className="bg-gray-50/50 rounded-xl p-6 backdrop-blur-sm">
+            <div className="max-w-5xl mx-auto px-1 md:px-4">
+              <div className="bg-gray-50/50 rounded-xl p-1 backdrop-blur-sm">
                 <div className="space-y-4">
                   {currentFilteredData.length > 0 ? (
                     currentFilteredData.map((property, index) => (
@@ -88,7 +83,7 @@ const Listing = () => {
             </div>
           </div>
         ) : (
-          <p className="text-4xl text-gray-500 font-semibold">Loading...</p>
+          <p className="text-2xl md:text-4xl text-gray-500 font-semibold">Loading...</p>
         )}
       </div>
 

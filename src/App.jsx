@@ -8,8 +8,8 @@ function App() {
     <>
 
     {/* Header */}
-    <div className=" backdrop-blur-md rounded-xl  p-2 text-center">
-      <h1 className="text-3xl font-semibold text-blue-800 mb-4 tracking-tight">
+    <div className="backdrop-blur-md rounded-xl p-2 text-center">
+      <h1 className="text-xl md:text-3xl font-semibold text-blue-800 mb-4 tracking-tight">
         <span className="text-blue-600">GI Inventory Management</span> 
       </h1>
       <div className="mt-3 flex justify-center">

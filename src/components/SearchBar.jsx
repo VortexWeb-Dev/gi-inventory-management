@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Search, X } from 'lucide-react';
+import React, { useState, useRef } from "react";
+import { Search, X } from "lucide-react";
 
 const Searchbar = ({ searchTerm, setSearchTerm }) => {
   const inputRef = useRef(null);
@@ -9,12 +9,8 @@ const Searchbar = ({ searchTerm, setSearchTerm }) => {
   };
 
   const handleClear = () => {
-    setSearchTerm('');
+    setSearchTerm("");
     inputRef.current.focus();
-  };
-
-  const handleSearch = () => {
-    // console.log('Searching for:', searchTerm);
   };
 
   return (
@@ -41,13 +37,12 @@ const Searchbar = ({ searchTerm, setSearchTerm }) => {
         </button>
       )}
 
-<button
+      {/* <button
         onClick={handleSearch}
         className="absolute inset-y-0 right-0 bg-blue-600 text-white py-2 px-4 rounded-r-full hover:bg-blue-700 focus:outline-none text-sm font-medium"
       >
         Search
-      </button>
-    
+      </button> */}
     </div>
   );
 };

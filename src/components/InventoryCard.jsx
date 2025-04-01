@@ -26,21 +26,29 @@ const PropertyCard = ({ property }) => {
   };
 
   return (
-    <div className="flex bg-white rounded-lg shadow-md overflow-hidden m-4">
-      {/* Image Section (42% width) */}
-      <div className="w-[42%] relative">
-        <img
-          src={property.images[mainImageIndex]?.url}
-          alt={property.title}
-          className="w-[100%] h-[100%] object-cover"
-        />
+    <div className="md:flex bg-white rounded-lg shadow-md overflow-hidden my-4 w-[100%]">
+      {/* Image Section - Full width and more square on mobile, 42% width on desktop */}
+      <div className="w-full h-54 md:h-80 md:h-auto md:w-[42%] relative">
+
+
+       {property.images[mainImageIndex]?.url ? (
+    <img
+      src={property.images[mainImageIndex].url}
+      alt={property.title}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <div className="w-full h-54 md:h-80 bg-blue-100 flex items-center justify-center">
+      <span className="text-blue-800 text-xl">NO IMAGE AVAILABLE</span>
+    </div>
+  )}
 
         {property.images.length > 1 && (
           <>
             <div className="absolute inset-0 flex items-center justify-between px-2">
               <button
                 onClick={handlePrevImage}
-                className="bg-gray-200 bg-opacity-50 rounded-full cursor-pointer  hover:opacity-100"
+                className="bg-gray-200 bg-opacity-50 rounded-full cursor-pointer hover:opacity-100"
               >
                 <ChevronLeft className="h-8 w-8 rounded-full hover:bg-gray-300" />
               </button>
@@ -56,19 +64,20 @@ const PropertyCard = ({ property }) => {
             </div>
           </>
         )}
-
       </div>
 
-      {/* Content Section (58% width) */}
-      <div className="w-[58%] p-4 relative flex flex-col justify-between">
+      {/* Content Section - Full width on mobile, 58% on desktop */}
+      <div className="w-full md:w-[58%] p-4 relative flex flex-col justify-between">
         <div>
           <div className="flex items-center mb-2">
-            <span className="text-xl font-semibold mr-2">
+            <span className="text-md md:text-xl font-semibold mr-2">
               AED {property.price}
             </span>
           </div>
+          
+          {/* Status indicator */}
           {property.status === "Published" ? (
-            <div className="absolute top-2 right-2 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+            <div className="absolute top-2 right-2 text-green-800 text-xs font-semibold px-1 py-1 rounded">
               <Dot className="w-10 h-10 inline-block text-green-600" />
               PUBLISHED
             </div>
@@ -80,21 +89,22 @@ const PropertyCard = ({ property }) => {
           )}
 
           <div className="text-left">
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <span>{property.unitType}</span>
+            {/* Property details with responsive wrapping */}
+            <div className="flex flex-wrap items-center text-sm text-gray-600 mb-2">
+              <span className="mr-3 mb-1">{property.unitType}</span>
               {property.bedrooms && (
-                <span className="ml-2 flex items-center">
+                <span className="mr-3 mb-1 flex items-center">
                   <BedDouble className="w-5 h-5 mr-1" />
                   {property.bedrooms} Bedrooms
                 </span>
               )}
               {property.bathrooms && (
-                <span className="ml-2 flex items-center">
+                <span className="mr-3 mb-1 flex items-center">
                   <Bath className="w-5 h-5 mr-1" />
                   {property.bathrooms} Bathrooms
                 </span>
               )}
-              <span className="ml-2">Area: {property.size} sqft</span>
+              <span className="mb-1">Area: {property.size} sqft</span>
             </div>
             <p className="text-sm text-blue-600 mb-2">{property.title}</p>
             <p className="text-sm text-gray-700">
@@ -107,7 +117,8 @@ const PropertyCard = ({ property }) => {
           </div>
         </div>
 
-        <div className="flex items-center justify-between mt-4">
+        {/* Contact and owner info */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
           <div>
             <div className="flex items-center">
               <a
