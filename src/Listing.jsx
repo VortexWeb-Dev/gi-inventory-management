@@ -59,6 +59,7 @@ const Listing = () => {
 
   return (
     <>
+    
       <div className="mx-auto">
         <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} />
         {propertiesData && (propertiesData.length > 0)? (

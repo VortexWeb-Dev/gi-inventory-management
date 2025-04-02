@@ -121,18 +121,20 @@ const PropertyCard = ({ property }) => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
           <div>
             <div className="flex items-center">
+              <div className="text-sm">
+              Listing Owner:  &nbsp;
+              </div>
+            
               <a
                 href={property.ownerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-semibold text-blue-600 underline"
+                className="text-sm font-semibold text-blue-600 underline "
               >
-                Owner: {property.ownerName}
+               {property.ownerName}
               </a>
             </div>
-            <div className="flex items-center">
-              Agent: {property.agentName}
-            </div>
+            
           </div>
 
           <div className="flex space-x-2">

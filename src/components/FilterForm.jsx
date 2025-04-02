@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Search, Bed, Bath, Home, ListChecks, Building, House, PersonStanding } from 'lucide-react';
+import AutocompleteSearch from './SearchBar';
 
 const RangeFilter = ({ label, fromValue, toValue, onFromChange, onToChange, onClose }) => {
   return (
@@ -33,13 +34,15 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
   const savedFilteredData = useRef(null);
   const hasRun = useRef(false);
 
-  useEffect(() => {
-    if (hasRun.current || filteredData.length === 0) return;
+  const [locationsArray, setLocationsArray] = useState(null);
 
-    savedFilteredData.current = filteredData;
-    hasRun.current = true;
-    // console.log("savedFilteredData: ", savedFilteredData);
-  }, [filteredData]);
+useEffect(() => {
+  if (hasRun.current || filteredData.length === 0) return;
+
+  savedFilteredData.current = filteredData;
+  hasRun.current = true;
+  setLocationsArray(savedFilteredData.current.map(item => item.locationBayut));
+}, [filteredData]);
 
   const [filters, setFilters] = useState({
     agentName: '',
@@ -94,6 +97,8 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
     
     return result;
   }
+
+
 
   const handleFilterClick = () => {
     const newFilteredData = savedFilteredData.current.filter(item =>
@@ -150,7 +155,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
 
   // Input groups for the form
   const textInputs = [
-    { name: "agentName", placeholder: "Agents", Icon: Search },
+    
     { name: "ownerName", placeholder: "Owners", Icon: Search },
     { name: "comm", placeholder: "Community", Icon: House },
     { name: "subComm", placeholder: "Sub Community", Icon: PersonStanding },
@@ -166,6 +171,9 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
 
   return (
     <div className="w-full px-4 py-2">
+
+      <AutocompleteSearch locations ={locationsArray} savedProperty={savedFilteredData.current} setProperty={setFilteredData}/>
+
       <div className="bg-white bg-opacity-10 rounded-xl shadow-md p-4 md:p-6 backdrop-filter backdrop-blur-lg w-full max-w-4xl mx-auto">
         {/* Mobile toggle button */}
         <button 
@@ -215,7 +223,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
               onClick={handleFilterClick}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 text-lg rounded-md"
             >
-              Filter
+              Search
             </button>
             <button
               type="button"
