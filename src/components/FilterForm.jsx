@@ -75,6 +75,14 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
     }
   };
 
+  // Get input style based on whether filter is applied
+  const getInputStyle = (filterName) => {
+    const isApplied = filters[filterName] !== '';
+    return isApplied 
+      ? "w-full h-11 border border-blue-500 bg-blue-100 rounded-md p-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+      : "w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500";
+  };
+
   // Filter definitions (matching the state keys)
   const textFilter = { name: "ownerName", placeholder: "Listing Owner" };
   const selectFilters = [
@@ -115,7 +123,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
               value={filters[textFilter.name]}
               onChange={handleInputChange}
               placeholder={textFilter.placeholder}
-              className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              className={getInputStyle(textFilter.name)}
             />
           </div>
 
@@ -126,7 +134,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
                 name={selectFilters[0].name}
                 value={filters[selectFilters[0].name]}
                 onChange={handleInputChange}
-                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+                className={getInputStyle(selectFilters[0].name) + " bg-white appearance-none"}
               >
                 <option value="" >{selectFilters[0].label}</option> {/* Placeholder */}
                 {selectFilters[0].options.map((option) => (
@@ -143,7 +151,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
                 name={selectFilters[1].name}
                 value={filters[selectFilters[1].name]}
                 onChange={handleInputChange}
-                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+                className={getInputStyle(selectFilters[1].name) + " bg-white appearance-none"}
               >
                 <option value="" >{selectFilters[1].label}</option> {/* Placeholder */}
                  {selectFilters[1].options.map((option) => (
@@ -159,7 +167,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
                 name={selectFilters[2].name}
                 value={filters[selectFilters[2].name]}
                 onChange={handleInputChange}
-                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+                className={getInputStyle(selectFilters[2].name) + " bg-white appearance-none"}
               >
                 <option value="" >{selectFilters[2].label}</option> {/* Placeholder */}
                 {selectFilters[2].options.map((option) => (
@@ -175,7 +183,7 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
                 name={selectFilters[3].name}
                 value={filters[selectFilters[3].name]}
                 onChange={handleInputChange}
-                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+                className={getInputStyle(selectFilters[3].name) + " bg-white appearance-none"}
               >
                 <option value="" >{selectFilters[3].label}</option> {/* Placeholder */}
                 {selectFilters[3].options.map((option) => (
