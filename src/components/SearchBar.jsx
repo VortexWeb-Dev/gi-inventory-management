@@ -66,9 +66,9 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
       setSuggestions(fuzzyResults);
       
       // Debug - log results with scores to understand matches
-      console.log('Search results with scores:', 
-        fuzzyResults
-      );
+      // console.log('Search results with scores:', 
+      //   fuzzyResults
+      // );
     } catch (error) {
       console.error('Error performing fuzzy search:', error);
       setSuggestions([]);
@@ -80,16 +80,6 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
     setSearchTerm(location);
     setShowSuggestions(false);
     
-    // Filter properties based on selected location
-    // const filteredProperties = savedProperty.filter(
-    //   (property) => property.locationBayut === location
-    // );
-    // console.log(savedProperty);
-    // console.log(filteredProperties);
-    
-    
-    // // Update properties with filtered results
-    // setProperty(filteredProperties);
   };
 
   // Function to handle input change
@@ -98,11 +88,6 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
     
     setSearchTerm(newsearchTerm);
 
-    // const filteredProperties = savedProperty.filter(
-    //   (property) => property.locationBayut.toLowerCase().includes(newsearchTerm.toLowerCase())
-    // );
-
-    // setProperty(filteredProperties)
     console.log(newsearchTerm);
     
     if (newsearchTerm.trim() === "") {

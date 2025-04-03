@@ -8,6 +8,10 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [locationsArray, setLocationsArray] = useState(null);
+  const [bedArray, setBedArray] = useState(['', 0, 1, 2, 3, 4, 5])
+  const [bathArray, setBathArray] = useState(['', 0, 1, 2, 3, 4, 5])
+  const [unitTypeArray, setUnitTypeArray] = useState(["", "Apartment", "Villa", "Short Term / Hotel Apartment"])
+  const [statusArray, setStatusArray] = useState(["", "Published", "Pocketed"])
 
   useEffect(() => {
     // Initialize saved data only once when filteredData is first populated
@@ -17,7 +21,16 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
     hasRun.current = true;
     // Extract locations for AutocompleteSearch after saving initial data
     // Ensure item.locationBayut exists before mapping
-    setLocationsArray(savedFilteredData.current.map(item => item?.locationBayut).filter(Boolean));
+    setLocationsArray([
+      ...new Set(savedFilteredData.current.map(item => item?.locationBayut || item?.locationPf).filter(Boolean))
+  ]);  
+    setBedArray([...new Set(savedFilteredData.current.map(item => item?.bedrooms).filter(Boolean))].sort((a, b) => a - b));
+    setBathArray([...new Set(savedFilteredData.current.map(item => item?.bathrooms).filter(Boolean))].sort((a, b) => a - b));
+  
+    setUnitTypeArray([...new Set(savedFilteredData.current.map(item => item?.unitType).filter(Boolean))])
+    setStatusArray([...new Set(savedFilteredData.current.map(item => item?.status).filter(Boolean))])
+
+
   }, [filteredData]); // Depend only on filteredData
 
   // State for filters - using original keys to avoid changing logic
@@ -86,10 +99,10 @@ const FilterBar = ({ filteredData, setFilteredData }) => {
   // Filter definitions (matching the state keys)
   const textFilter = { name: "ownerName", placeholder: "Listing Owner" };
   const selectFilters = [
-    { name: "bedrooms", label: "Bed", options: ['', 0, 1, 2, 3, 4, 5] }, // Added '' for default/placeholder
-    { name: "bathrooms", label: "Bath", options: ['', 0, 1, 2, 3, 4, 5] }, // Added '' for default/placeholder
-    { name: "unitType", label: "Unit Type (Default)", options: ["", "Apartment", "Villa", "Short Term / Hotel Apartment"] }, // Added ''
-    { name: "status", label: "Status (Default)", options: ["", "Published", "Pocketed"] }, // Added ''
+    { name: "bedrooms", label: "Bed", options: bedArray }, // Added '' for default/placeholder
+    { name: "bathrooms", label: "Bath", options: bathArray }, // Added '' for default/placeholder
+    { name: "unitType", label: "Unit Type (Default)", options: unitTypeArray }, // Added ''
+    { name: "status", label: "Status (Default)", options: statusArray }, // Added ''
   ];
 
   return (
