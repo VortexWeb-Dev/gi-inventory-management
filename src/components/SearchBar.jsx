@@ -1,56 +1,111 @@
 
 import React, { useState, useEffect } from "react";
 import { MapPin, Search, X } from "lucide-react";
-const AutocompleteSearch = ({ locations, savedProperty, setProperty }) => {
-  const [query, setQuery] = useState("");
+import Fuse from 'fuse.js';
+
+const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm, setSearchTerm }) => {
+  // const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Function to filter locations based on search query
+  // Function to filter locations based on search searchTerm
+  // useEffect(() => {
+  //   if (searchTerm.trim() === "") {
+  //     setSuggestions([]);
+  //     return;
+  //   }
+
+  //   const filteredLocations = locations.filter((location) =>
+  //     location.toLowerCase().includes(searchTerm.toLowerCase())
+  //   );
+
+  //   setSuggestions(filteredLocations);
+  // }, [searchTerm, locations]);
+
+
+
+  const [fuseInstance, setFuseInstance] = useState(null);
+  
+  // Initialize Fuse instance once when locations change
   useEffect(() => {
-    if (query.trim() === "") {
+    // Safeguard against null or undefined locations
+    const locationsArray = Array.isArray(locations) ? locations : [];
+    
+    // Configure Fuse options specifically for strings like "tower C, place, street, city"
+    const options = {
+      includeScore: true,
+      threshold: 0.4, // Increased threshold for better partial matching
+      ignoreLocation: true, // Important for location strings where the match can be anywhere
+      distance: 100, // Allow matching across the entire string
+    };
+    
+    // Only create instance if we have valid locations
+    if (locationsArray.length > 0) {
+      setFuseInstance(new Fuse(locationsArray, options));
+    } else {
+      setFuseInstance(null);
+    }
+  }, [locations]);
+  
+  // Perform search when searchTerm changes
+  useEffect(() => {
+    if (!fuseInstance || searchTerm.trim() === "") {
       setSuggestions([]);
       return;
     }
-
-    const filteredLocations = locations.filter((location) =>
-      location.toLowerCase().includes(query.toLowerCase())
-    );
-
-    setSuggestions(filteredLocations);
-  }, [query, locations]);
-
+    
+    try {
+      // Perform fuzzy search
+      const results = fuseInstance.search(searchTerm);
+      
+      // Extract just the matched strings
+      const fuzzyResults = results
+  .map(result => result.item)
+  .sort((a, b) => b.score - a.score);
+      
+      setSuggestions(fuzzyResults);
+      
+      // Debug - log results with scores to understand matches
+      console.log('Search results with scores:', 
+        fuzzyResults
+      );
+    } catch (error) {
+      console.error('Error performing fuzzy search:', error);
+      setSuggestions([]);
+    }
+  }, [searchTerm, fuseInstance]);
+  
   // Function to handle property filtering
   const handleLocationSelect = (location) => {
-    setQuery(location);
+    setSearchTerm(location);
     setShowSuggestions(false);
     
     // Filter properties based on selected location
-    const filteredProperties = savedProperty.filter(
-      (property) => property.locationBayut === location
-    );
-    console.log(savedProperty);
-    console.log(filteredProperties);
+    // const filteredProperties = savedProperty.filter(
+    //   (property) => property.locationBayut === location
+    // );
+    // console.log(savedProperty);
+    // console.log(filteredProperties);
     
     
-    // Update properties with filtered results
-    setProperty(filteredProperties);
+    // // Update properties with filtered results
+    // setProperty(filteredProperties);
   };
 
   // Function to handle input change
   const handleInputChange = (e) => {
-    const newQuery = e.target.value;
+    const newsearchTerm = e.target.value;
     
-    setQuery(newQuery);
+    setSearchTerm(newsearchTerm);
 
-    const filteredProperties = savedProperty.filter(
-      (property) => property.locationBayut.toLowerCase().includes(newQuery.toLowerCase())
-    );
+    // const filteredProperties = savedProperty.filter(
+    //   (property) => property.locationBayut.toLowerCase().includes(newsearchTerm.toLowerCase())
+    // );
 
-    setProperty(filteredProperties)
-    console.log(newQuery);
+    // setProperty(filteredProperties)
+    console.log(newsearchTerm);
     
-    if (newQuery.trim() === "") {
+    if (newsearchTerm.trim() === "") {
       // Reset to show all properties when search is cleared
       setProperty(savedProperty);
     }
@@ -62,19 +117,19 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty }) => {
         <input
           type="text"
           className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          placeholder="Search for a location..."
-          value={query}
+          placeholder="Search for a city, community or building..."
+          value={searchTerm}
           onChange={handleInputChange}
           onFocus={() => setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 500)}
         />
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"/>
-        {query && (
+        {searchTerm && (
           <button 
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
             onClick={() => {
-              setQuery("");
-              setProperty(savedProperty);
+              setSearchTerm("");
+              // setProperty(savedProperty);
             }}
           >
             

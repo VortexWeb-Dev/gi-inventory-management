@@ -1,238 +1,208 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, Bed, Bath, Home, ListChecks, Building, House, PersonStanding } from 'lucide-react';
-import AutocompleteSearch from './SearchBar';
 
-const RangeFilter = ({ label, fromValue, toValue, onFromChange, onToChange, onClose }) => {
-  return (
-    <div className="absolute bg-white border rounded-md shadow-md p-4 mt-2 z-10">
-      <h3 className="text-lg font-semibold mb-2">{label} Range</h3>
-      <div className="flex items-center space-x-2">
-        <input
-          type="number"
-          value={fromValue}
-          onChange={(e) => onFromChange(e.target.value)}
-          placeholder="From"
-          className="border rounded-md p-2 w-24"
-        />
-        <span>-</span>
-        <input
-          type="number"
-          value={toValue}
-          onChange={(e) => onToChange(e.target.value)}
-          placeholder="To"
-          className="border rounded-md p-2 w-24"
-        />
-      </div>
-      <button onClick={onClose} className="mt-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
-        Apply
-      </button>
-    </div>
-  );
-};
+import AutocompleteSearch from './SearchBar';
 
 const FilterBar = ({ filteredData, setFilteredData }) => {
   const savedFilteredData = useRef(null);
   const hasRun = useRef(false);
 
+  const [searchTerm, setSearchTerm] = useState('');
   const [locationsArray, setLocationsArray] = useState(null);
 
-useEffect(() => {
-  if (hasRun.current || filteredData.length === 0) return;
+  useEffect(() => {
+    // Initialize saved data only once when filteredData is first populated
+    if (hasRun.current || !filteredData || filteredData.length === 0) return;
 
-  savedFilteredData.current = filteredData;
-  hasRun.current = true;
-  setLocationsArray(savedFilteredData.current.map(item => item.locationBayut));
-}, [filteredData]);
+    savedFilteredData.current = filteredData;
+    hasRun.current = true;
+    // Extract locations for AutocompleteSearch after saving initial data
+    // Ensure item.locationBayut exists before mapping
+    setLocationsArray(savedFilteredData.current.map(item => item?.locationBayut).filter(Boolean));
+  }, [filteredData]); // Depend only on filteredData
 
+  // State for filters - using original keys to avoid changing logic
   const [filters, setFilters] = useState({
-    agentName: '',
-    ownerName: '',
-    bedrooms: '',
-    bathrooms: '',
-    unitType: '',
-    status: '',
-    comm: '',
-    subComm: '',
-    building: ''
+    ownerName: '', 
+    bedrooms: '',  
+    bathrooms: '', 
+    unitType: '',  
+    status: '',    
   });
 
-  const [showPriceFilter, setShowPriceFilter] = useState(false);
-  const [showSizeFilter, setShowSizeFilter] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
-  const clearPriceFilter = () => {
-    setFilters({ ...filters, priceFrom: '', priceTo: '' });
-  };
-
-  const clearSizeFilter = () => {
-    setFilters({ ...filters, sizeFrom: '', sizeTo: '' });
-  };
-
+  // Handle input changes for both text and select
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFilters({ ...filters, [name]: value });
   };
 
-  function processLocations(locationPf, locationBayut) {
-    // Split both strings by " - "
-    let pfParts = locationPf.split(" - ");
-    let bayutParts = locationBayut.split(" - ");
-    
-    let result = [];
-    
-    // First element: first part of both
-    result.push(`${pfParts[0]} ${bayutParts[0]}`);
-    
-    // Second element: second part of both
-    result.push(`${pfParts[1] || ''} ${bayutParts[1] || ''}`.trim());
-    
-    // Third element: remaining middle part of bayut excluding already used ones in pf
-    let remainingBayutParts = bayutParts.slice(2, -1);
-    let remainingPfParts = pfParts.slice(2, -1);
-    let middlePart = [...remainingPfParts, ...remainingBayutParts].join(" ");
-    result.push(middlePart);
-    
-    // Fourth element: last part of both
-    result.push(`${pfParts.at(-1)} ${bayutParts.at(-1)}`);
-    
-    return result;
-  }
-
-
-
+  // Apply filters
   const handleFilterClick = () => {
-    const newFilteredData = savedFilteredData.current.filter(item =>
-      Object.entries(filters).every(([key, value]) => {
+    if (!savedFilteredData.current) return; // Guard clause if initial data isn't set
+
+    const newFilteredData = savedFilteredData.current.filter(item => {
+      // Check location search term first
+      const locationMatch = item?.locationBayut?.toLowerCase().includes(searchTerm.toLowerCase()) ?? true; // Assume true if locationBayut is missing
+
+      // Check other filters
+      const filterMatch = Object.entries(filters).every(([key, value]) => {
         if (value !== '' && value !== null) {
-          if (["comm", "subComm", "building"].includes(key)) {
-            const locationData = processLocations(item.locationPf, item.locationBayut);
-            const lowerValue = value.toString().toLowerCase();
-            
-            if (key === "comm") {
-              return locationData[1]?.toString().toLowerCase().includes(lowerValue);
-            } else if (key === "subComm") {
-              if (locationData[3] && locationData[2] != '') {
-                return locationData[2].toString().toLowerCase().includes(lowerValue);
-              } else {
-                return locationData[1]?.toString().toLowerCase().includes(lowerValue);
-              }
-            } else if (key === "building") {
-              return locationData[3]?.toString().toLowerCase().includes(lowerValue);
-            }
-          } else {
-            return item[key]?.toString().toLowerCase().includes(value.toString().toLowerCase());
-          }
+          // Ensure item[key] exists and handle potential type mismatches
+          const itemValue = item?.[key];
+          if (itemValue === undefined || itemValue === null) return false; // If field doesn't exist on item, it doesn't match
+          return itemValue.toString().toLowerCase().includes(value.toString().toLowerCase());
         }
-        return true;
-      })
-    );
+        return true; // If filter value is empty, it's a match
+      });
+
+      return locationMatch && filterMatch;
+    });
 
     setFilteredData(newFilteredData);
-    // On mobile, collapse the filter after applying
-    if (window.innerWidth < 768) {
-      setIsCollapsed(true);
-    }
   };
 
+  // Reset all filters and search term
   const handleReset = () => {
     setFilters({
-      agentName: '',
       ownerName: '',
       bedrooms: '',
       bathrooms: '',
       unitType: '',
       status: '',
-      comm: '',
-      subComm: '',
-      building: ''
     });
-    setFilteredData(savedFilteredData.current);
+    setSearchTerm(''); // Reset search term as well
+    if (savedFilteredData.current) {
+      setFilteredData(savedFilteredData.current); // Reset to original data
+    }
   };
 
-  const toggleFilters = () => {
-    setIsCollapsed(!isCollapsed);
-  };
-
-  // Input groups for the form
-  const textInputs = [
-    
-    { name: "ownerName", placeholder: "Owners", Icon: Search },
-    { name: "comm", placeholder: "Community", Icon: House },
-    { name: "subComm", placeholder: "Sub Community", Icon: PersonStanding },
-    { name: "building", placeholder: "Building", Icon: Building },
-  ];
-
-  const selectInputs = [
-    { name: "bedrooms", label: "Beds", Icon: Bed, options: [0, 1, 2, 3, 4, 5] },
-    { name: "bathrooms", label: "Baths", Icon: Bath, options: [0, 1, 2, 3, 4, 5] },
-    { name: "unitType", label: "Unit Type", Icon: Home, options: ["Apartment", "Villa", "Short Term / Hotel Apartment"] },
-    { name: "status", label: "Status", Icon: ListChecks, options: ["Published", "Pocketed"] },
+  // Filter definitions (matching the state keys)
+  const textFilter = { name: "ownerName", placeholder: "Listing Owner" };
+  const selectFilters = [
+    { name: "bedrooms", label: "Bed", options: ['', 0, 1, 2, 3, 4, 5] }, // Added '' for default/placeholder
+    { name: "bathrooms", label: "Bath", options: ['', 0, 1, 2, 3, 4, 5] }, // Added '' for default/placeholder
+    { name: "unitType", label: "Unit Type (Default)", options: ["", "Apartment", "Villa", "Short Term / Hotel Apartment"] }, // Added ''
+    { name: "status", label: "Status (Default)", options: ["", "Published", "Pocketed"] }, // Added ''
   ];
 
   return (
-    <div className="w-full px-4 py-2">
+    // Outer container for the whole bar
+    <div className="w-full px-4 py-2 space-y-4">
 
-      <AutocompleteSearch locations ={locationsArray} savedProperty={savedFilteredData.current} setProperty={setFilteredData}/>
+      {/* Row 1: Search Bar (Already handles its own styling) */}
+      <AutocompleteSearch
+        locations={locationsArray}
+        savedProperty={savedFilteredData.current}
+        setProperty={setFilteredData}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+      />
 
-      <div className="bg-white bg-opacity-10 rounded-xl shadow-md p-4 md:p-6 backdrop-filter backdrop-blur-lg w-full max-w-4xl mx-auto">
-        {/* Mobile toggle button */}
-        <button 
-          className="w-full md:hidden flex justify-between items-center bg-blue-600 text-white p-3 rounded-md mb-4"
-          onClick={toggleFilters}
-        >
-          <span className="font-medium">Filters</span>
-          <span>{isCollapsed ? '▼' : '▲'}</span>
-        </button>
+      {/* Container for Filters and Buttons */}
+      {/* Using flex-col on mobile and flex-row on desktop */}
+      <div className="bg-white bg-opacity-90 rounded-lg shadow p-4 w-full max-w-[85%] mx-auto flex flex-col md:flex-row md:items-center md:gap-3">
 
-        {/* Filter form - will be hidden on mobile when collapsed */}
-        <div className={`${isCollapsed ? 'hidden' : 'flex'} md:flex flex-col md:flex-row flex-wrap justify-center gap-2 md:gap-4`}>
-          {textInputs.map(({ name, placeholder, Icon }) => (
-            <div key={name} className="flex items-center space-x-2 w-full md:w-56 mb-2">
-              <Icon className="text-blue-300 h-5 w-5" />
-              <input
-                type="text"
-                name={name}
-                value={filters[name]}
+        {/* Filters Container - Uses grid for mobile layout */}
+        {/* Grid cols-6 allows 3 items (col-span-2) then 2 items (col-span-3) */}
+        {/* On desktop (md:), becomes part of the parent flex row */}
+        <div className="grid grid-cols-6 gap-3 md:flex md:flex-row md:flex-wrap md:gap-3 md:flex-grow">
+
+          {/* Listing Owner (Text Input) */}
+          {/* Mobile: Takes 1/3 width */}
+          <div className="col-span-6 sm:col-span-2">
+            <input
+              type="text"
+              name={textFilter.name}
+              value={filters[textFilter.name]}
+              onChange={handleInputChange}
+              placeholder={textFilter.placeholder}
+              className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          {/* Bed (Dropdown) */}
+          {/* Mobile: Takes 1/3 width */}
+          <div className="col-span-3 sm:col-span-2">
+             <select
+                name={selectFilters[0].name}
+                value={filters[selectFilters[0].name]}
                 onChange={handleInputChange}
-                placeholder={placeholder}
-                className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 placeholder-blue-300 focus:outline-none focus:border-blue-400 w-full"
-              />
-            </div>
-          ))}
-          
-          {selectInputs.map(({ name, label, Icon, options }) => (
-            <div key={name} className="flex items-center space-x-2 w-full md:w-56 mb-2">
-              <Icon className="text-blue-300 h-5 w-5" />
-              <select
-                name={name}
-                value={filters[name]}
-                onChange={handleInputChange}
-                className="bg-transparent border border-blue-600 rounded-md p-2 text-gray-500 focus:outline-none focus:border-blue-400 w-full"
+                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
               >
-                <option value="">{label}</option>
-                {options.map((option) => (
-                  <option key={option} value={option}>{option}</option>
+                <option value="" >{selectFilters[0].label}</option> {/* Placeholder */}
+                {selectFilters[0].options.map((option) => (
+                  // Render placeholder differently if needed, or skip empty string option text
+                  option === "" ? null : <option key={option} value={option}>{option}</option>
                 ))}
               </select>
-            </div>
-          ))}
-          
-          <div className="flex flex-row justify-center gap-3 w-full mt-2">
-            <button
-              type="button"
-              onClick={handleFilterClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 text-lg rounded-md"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 text-lg rounded-md"
-            >
-              Reset
-            </button>
           </div>
+
+          {/* Bath (Dropdown) */}
+          {/* Mobile: Takes 1/3 width */}
+           <div className="col-span-3 sm:col-span-2">
+             <select
+                name={selectFilters[1].name}
+                value={filters[selectFilters[1].name]}
+                onChange={handleInputChange}
+                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+              >
+                <option value="" >{selectFilters[1].label}</option> {/* Placeholder */}
+                 {selectFilters[1].options.map((option) => (
+                   option === "" ? null : <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+          </div>
+
+          {/* Unit Type (Dropdown) */}
+          {/* Mobile: Takes 1/2 width */}
+          <div className="col-span-3">
+             <select
+                name={selectFilters[2].name}
+                value={filters[selectFilters[2].name]}
+                onChange={handleInputChange}
+                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+              >
+                <option value="" >{selectFilters[2].label}</option> {/* Placeholder */}
+                {selectFilters[2].options.map((option) => (
+                   option === "" ? null : <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+          </div>
+
+          {/* Status (Dropdown) */}
+          {/* Mobile: Takes 1/2 width */}
+          <div className="col-span-3">
+             <select
+                name={selectFilters[3].name}
+                value={filters[selectFilters[3].name]}
+                onChange={handleInputChange}
+                className="w-full h-11 border border-gray-300 rounded-md p-2 text-sm text-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white appearance-none"
+              >
+                <option value="" >{selectFilters[3].label}</option> {/* Placeholder */}
+                {selectFilters[3].options.map((option) => (
+                   option === "" ? null : <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+          </div>
+        </div>
+
+        {/* Buttons Container */}
+        {/* Mobile: Takes full width, centered buttons, margin top */}
+        {/* Desktop: Aligns with filters in the flex row */}
+        <div className="mt-4 md:mt-0 flex flex-row justify-center md:justify-start gap-3 flex-shrink-0">
+          <button
+            type="button"
+            onClick={handleFilterClick}
+            className="bg-blue-600 h-11 hover:bg-blue-700 text-white font-semibold py-2 px-5 text-sm rounded-md" // Adjusted Find button style
+          >
+            Search
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="bg-gray-300 h-11 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-5 text-sm rounded-md" // Adjusted Reset button style
+          >
+            Reset
+          </button>
         </div>
       </div>
     </div>
