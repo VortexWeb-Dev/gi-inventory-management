@@ -61,7 +61,8 @@ const Listing = () => {
     <>
     
       <div className="mx-auto">
-        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} refresh={refresh} setRefresh={setRefresh}/>
+        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} refresh={refresh} setRefresh={setRefresh} />
+
         {propertiesData && (propertiesData.length > 0)? (
           <div>
             <div className="w-full flex justify-center py-4">

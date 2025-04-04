@@ -3,7 +3,7 @@ import { RefreshCcw } from "lucide-react";
 import AutocompleteSearch from "./SearchBar";
 import toast from "react-hot-toast";
 
-const FilterBar = ({ filteredData, setFilteredData, refresh, setRefresh }) => {
+const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
   const savedFilteredData = useRef(null);
   const hasRun = useRef(false);
 
@@ -129,6 +129,14 @@ const FilterBar = ({ filteredData, setFilteredData, refresh, setRefresh }) => {
   const handleRefresh = () => {
     setRefresh((prev) => prev + 1);
     setIsSpinning(true);
+    setFilters({
+      ownerName: "",
+      bedrooms: "",
+      bathrooms: "",
+      unitType: "",
+      status: "",
+    });
+    setSearchTerm("");
 
     toast.success("Refreshed successfully!");
 
