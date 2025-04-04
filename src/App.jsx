@@ -1,6 +1,7 @@
 import './App.css'
 import Listing from './Listing'
 import { BrowserRouter } from 'react-router-dom'
+import  { Toaster } from 'react-hot-toast';
 function App() {
 
   return (
@@ -18,7 +19,7 @@ function App() {
     </div>
 
     <Listing/>
-
+    <Toaster />
     </>
     </BrowserRouter>
   )

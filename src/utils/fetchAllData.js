@@ -21,7 +21,6 @@ const fetchAllData = async () => {
       aggregateData = [...aggregateData, ...data];
       total = newTotal;
 
-      // console.log(aggregateData)
       if (aggregateData.length >= total) break;
 
       page++;
@@ -35,28 +34,3 @@ const fetchAllData = async () => {
 };
 
 export default fetchAllData;
-
-// const usePaginatedData = () => {
-//   const [data, setData] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const allData = await fetchAllData();
-//         setData(allData);
-//       } catch (err) {
-//         setError(err);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchData();
-//   }, []);
-
-//   return { data, loading, error };
-// };
-
-// export default usePaginatedData;

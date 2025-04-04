@@ -8,6 +8,7 @@ import FilterForm from "./components/FilterForm";
 const Listing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [propertiesData, setPropertiesData] = useState([]);
+  const [refresh, setRefresh] = useState(0);
   const [filteredData, setFilteredData] = useState(propertiesData);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,18 +30,17 @@ const Listing = () => {
       try {
       const allData = await fetchAllData();
       setPropertiesData(allData);
-      // console.log(allData);
+      console.log("refresh is now:",refresh);
+      
       }catch(err){
         setError(err)
       }
     };
 
     fetchData();
-  }, []);
+  }, [refresh]);
 
-  useEffect(() => {
-    // console.log("Updated propertiesData:", propertiesData);
-  }, [propertiesData]);
+ 
 
   useEffect(() => {
     propertiesData &&
@@ -61,7 +61,7 @@ const Listing = () => {
     <>
     
       <div className="mx-auto">
-        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} />
+        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} refresh={refresh} setRefresh={setRefresh}/>
         {propertiesData && (propertiesData.length > 0)? (
           <div>
             <div className="w-full flex justify-center py-4">

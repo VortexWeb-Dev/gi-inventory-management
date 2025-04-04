@@ -28,10 +28,9 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
   
   // Initialize Fuse instance once when locations change
   useEffect(() => {
-    // Safeguard against null or undefined locations
-    const locationsArray = Array.isArray(locations) ? locations : [];
     
-    // Configure Fuse options specifically for strings like "tower C, place, street, city"
+    const locationsArray = Array.isArray(locations) ? locations : [];
+   
     const options = {
       includeScore: true,
       threshold: 0.4, // Increased threshold for better partial matching
