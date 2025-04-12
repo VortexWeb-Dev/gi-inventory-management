@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { RefreshCcw } from "lucide-react";
 import AutocompleteSearch from "./SearchBar";
+import SearchableSelect from "../utils/SearchableSelect";
 import toast from "react-hot-toast";
 
 const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
@@ -18,12 +19,13 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
     "Short Term / Hotel Apartment",
   ]);
   const [statusArray, setStatusArray] = useState(["", "Published", "Pocketed"]);
+  const [ownerArray, setOwnerArray] = useState([""]);
   const [isSpinning, setIsSpinning] = useState(false);
 
   useEffect(() => {
     // Initialize saved data only once when filteredData is first populated
     if (hasRun.current || !filteredData || filteredData.length === 0) return;
-
+    
     savedFilteredData.current = filteredData;
     hasRun.current = true;
     // Extract locations for AutocompleteSearch after saving initial data
@@ -52,6 +54,17 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
             .filter(Boolean)
         ),
       ].sort((a, b) => a - b)
+    );
+
+    setOwnerArray(
+      [
+        "",
+        ...new Set(
+          savedFilteredData.current
+            .map((item) => item?.ownerName)
+            
+        ),
+      ]
     );
 
     setUnitTypeArray([
@@ -154,12 +167,11 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
   };
 
   // Filter definitions (matching the state keys)
-  const textFilter = { name: "ownerName", placeholder: "Listing Owner" };
   const selectFilters = [
-    { name: "bedrooms", label: "Bed", options: bedArray }, // Added '' for default/placeholder
-    { name: "bathrooms", label: "Bath", options: bathArray }, // Added '' for default/placeholder
-    { name: "unitType", label: "Unit Type (Default)", options: unitTypeArray }, // Added ''
-    { name: "status", label: "Status (Default)", options: statusArray }, // Added ''
+    { name: "bedrooms", label: "Bed", options: bedArray },
+    { name: "bathrooms", label: "Bath", options: bathArray },
+    { name: "unitType", label: "Unit Type (Default)", options: unitTypeArray },
+    { name: "status", label: "Status (Default)", options: statusArray },
   ];
 
   return (
@@ -181,18 +193,36 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
         {/* Grid cols-6 allows 3 items (col-span-2) then 2 items (col-span-3) */}
         {/* On desktop (md:), becomes part of the parent flex row */}
         <div className="grid grid-cols-6 gap-3 md:flex md:flex-row md:flex-wrap md:gap-3 md:flex-grow">
-          {/* Listing Owner (Text Input) */}
-          {/* Mobile: Takes 1/3 width */}
-          <div className="col-span-6 sm:col-span-2">
-            <input
-              type="text"
-              name={textFilter.name}
-              value={filters[textFilter.name]}
+
+          {/* Listing Owner (Now a Select Dropdown) */}
+
+          {/* <div className="col-span-6 sm:col-span-2">
+            <select
+              name="ownerName"
+              value={filters.ownerName}
               onChange={handleInputChange}
-              placeholder={textFilter.placeholder}
-              className={getInputStyle(textFilter.name)}
-            />
-          </div>
+              className={getInputStyle("ownerName") + " bg-white appearance-none"}
+            >
+              <option value="">Listing Owner</option>
+              {ownerArray.map((owner) =>
+                owner === "" ? null : (
+                  <option key={owner} value={owner}>
+                    {owner}
+                  </option>
+                )
+              )}
+            </select>
+          </div> */}
+
+<div className="col-span-6 sm:col-span-2 w-[25%]">
+  <SearchableSelect
+    name="ownerName"
+    value={filters.ownerName}
+    onChange={handleInputChange}
+    placeholder="Listing Owner"
+    options={ownerArray.filter(Boolean)}
+  />
+</div>
 
           {/* Bed (Dropdown) */}
           {/* Mobile: Takes 1/3 width */}
