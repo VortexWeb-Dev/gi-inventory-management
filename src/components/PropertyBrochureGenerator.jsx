@@ -63,7 +63,7 @@ const PropertyBrochureGenerator = ({ listing }) => {
       // Page dimensions
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
-      const margin = 15;
+      const margin = 10;
       const contentWidth = pageWidth - (margin * 2);
       
       // --- FIRST PAGE ---
