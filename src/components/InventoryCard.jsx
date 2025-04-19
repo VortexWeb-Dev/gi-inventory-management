@@ -9,6 +9,7 @@ import {
   ChevronRight,
   Bath
 } from "lucide-react";
+import PropertyBrochureGenerator from "./PropertyBrochureGenerator";
 
 const PropertyCard = ({ property }) => {
   const [mainImageIndex, setMainImageIndex] = useState(0);
@@ -113,7 +114,12 @@ const PropertyCard = ({ property }) => {
               <br />
               <MapPin className="h-4 w-4 mr-1 inline-block align-middle" />
               Bayut: {property.locationBayut}
+              
             </p>
+               <div className="mt-4">
+                <PropertyBrochureGenerator listing={property} />
+              </div>
+              
           </div>
         </div>
 
