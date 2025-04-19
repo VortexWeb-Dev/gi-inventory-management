@@ -332,20 +332,21 @@ const PropertyBrochureGenerator = ({ listing }) => {
   };
 
   return (
-    <button
-      onClick={generatePDF}
-      disabled={loading || !listing}
-      className={`
-        flex items-center gap-2 px-3 py-2 rounded-lg 
-        ${loading || !listing 
-          ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-          : 'border-2 border-[#0c372a] text-gray-500 hover:bg-green-50 cursor-pointer'}
-        transition duration-200 font-medium
-      `}
-    >
-      <Download size={20} />
-      {loading ? 'Generating...' : 'Download Brochure'}
-    </button>
+<button
+  onClick={generatePDF}
+  disabled={loading || !listing}
+  className={`
+    flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
+    ${loading || !listing 
+      ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+      : 'border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer'}
+    transition duration-150 font-medium
+  `}
+>
+  <Download size={16} />
+  {loading ? 'Generating...' : 'Brochure'}
+</button>
+
   );
 };
 
