@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
@@ -7,6 +7,23 @@ import axios from 'axios';
 const PropertyBrochureGenerator = ({ listing }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isMobileView, setIsMobileView] = useState(false);
+  
+  // Check if device is mobile based on screen width
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobileView(window.innerWidth < 768); // Consider mobile if width is less than 768px
+    };
+    
+    // Set initial value
+    checkScreenSize();
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   // Improved function to convert image to base64 with better error handling
   const getBase64FromUrl = async (url) => {
@@ -17,7 +34,7 @@ const PropertyBrochureGenerator = ({ listing }) => {
       
       const response = await axios.get(imageUrl.toString(), { 
         responseType: 'blob',
-        timeout: 10000, // 10 second timeout
+        // timeout: 10000, // 10 second timeout
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
@@ -319,8 +336,24 @@ const PropertyBrochureGenerator = ({ listing }) => {
         doc.text('GI PROPERTIES', margin, galleryFooterY + 5);
       }
       
-      // Save the PDF with a filename based on property reference
-      doc.save(`${listing.reference || 'property'}-brochure.pdf`);
+      // Different handling based on device size
+      if (isMobileView) {
+        // For mobile: Create blob URL and open in new browser window
+        const pdfBlob = doc.output('blob');
+        const blobUrl = URL.createObjectURL(pdfBlob);
+        
+        // Open in browser
+        window.open(blobUrl, '_blank');
+        
+        // Clean up the blob URL after a timeout to ensure it loads
+        setTimeout(() => {
+          URL.revokeObjectURL(blobUrl);
+        }, 60000); // 1 minute timeout
+        
+      } else {
+        // For desktop: Use normal download method
+        doc.save(`${listing.reference || 'property'}-brochure.pdf`);
+      }
       
       console.log('PDF generation complete');
     } catch (err) {
@@ -332,21 +365,20 @@ const PropertyBrochureGenerator = ({ listing }) => {
   };
 
   return (
-<button
-  onClick={generatePDF}
-  disabled={loading || !listing}
-  className={`
-    flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
-    ${loading || !listing 
-      ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
-      : 'border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer'}
-    transition duration-150 font-medium
-  `}
->
-  <Download size={16} />
-  {loading ? 'Generating...' : 'Brochure'}
-</button>
-
+    <button
+      onClick={generatePDF}
+      disabled={loading || !listing}
+      className={`
+        flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
+        ${loading || !listing 
+          ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+          : 'border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer'}
+        transition duration-150 font-medium
+      `}
+    >
+      <Download size={16} />
+      {loading ? 'Generating...' : 'Brochure'}
+    </button>
   );
 };
 
