@@ -12,19 +12,37 @@ const PropertyBrochureGenerator = ({ listing }) => {
 
   // Check if device is mobile based on screen width
   useEffect(() => {
-   
-    const checkScreenSize = () => {
-      setIsMobileView(window.innerWidth < 768); // Consider mobile if width is less than 768px
+    const checkEnvironment = () => {
+      // Check screen width
+      const isSmallScreen = window.innerWidth < 768;
+      
+      // Check for Bitrix mobile app indicators
+      const isBitrixMobileApp = typeof window.BXMobileApp !== 'undefined' || 
+                               (typeof window.navigator !== 'undefined' && 
+                                navigator.userAgent.includes('BitrixMobile'));
+      
+      // General mobile detection as fallback
+      const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Set mobile view if any condition is true
+      setIsMobileView(isSmallScreen || isBitrixMobileApp || isMobileUserAgent);
+      
+      // Optionally log what was detected for debugging
+      console.log({
+        isSmallScreen,
+        isBitrixMobileApp,
+        isMobileUserAgent
+      });
     };
-
+  
     // Set initial value
-    checkScreenSize();
-
+    checkEnvironment();
+  
     // Add event listener for window resize
-    window.addEventListener("resize", checkScreenSize);
-
+    window.addEventListener("resize", checkEnvironment);
+  
     // Clean up
-    return () => window.removeEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkEnvironment);
   }, []);
 
   // Improved function to convert image to base64 with better error handling
@@ -398,28 +416,48 @@ const PropertyBrochureGenerator = ({ listing }) => {
       }
 
       if (isMobileView) {
-        console.log(window.BX);
         const pdfBlob = doc.output("blob");
         const blobUrl = URL.createObjectURL(pdfBlob);
-        try{
-          
-             if (typeof window.BX !== 'undefined' || window.BXMobileApp!= 'undefined') {
-               // window.BX.openExternalLink(blobUrl);
-               window.BXMobileApp.UI.Document.open({
-                 url: blobUrl,
-                 title: `${listing.reference || "property"}-brochure.pdf`,
-                 type: 'pdf',
-               });
-               
-             } 
-        //      else {
-
-        //        window.open(blobUrl, '_blank'); // fallback for non-Bitrix environments
-        // }
-          }catch(err){
-              window.alert("error is: ", err + "bx objects: ", window.BXMobileApp," ", window.BX)
-          }
         
+        try {
+          // Check if we're in Bitrix mobile environment
+          if (typeof window.BXMobileApp !== 'undefined' && window.BXMobileApp.UI && window.BXMobileApp.UI.Document) {
+            // Use Bitrix mobile document viewer
+            window.BXMobileApp.UI.Document.open({
+              url: blobUrl,
+              title: `${listing.reference || "property"}-brochure.pdf`,
+              type: 'pdf',
+            });
+            console.log("Opened PDF with BXMobileApp");
+          } else if (typeof window.BX !== 'undefined' && window.BX.openExternalLink) {
+            // Try older Bitrix method
+            window.BX.openExternalLink(blobUrl);
+            console.log("Opened PDF with BX.openExternalLink");
+          } else {
+            // General mobile fallback - create a temporary download link
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `${listing.reference || "property"}-brochure.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            console.log("Used fallback download method");
+          }
+        } catch (err) {
+          console.error("PDF download error:", err);
+          // More user-friendly error message
+          const errorMessage = `Unable to download PDF: ${err.message}`;
+          alert(errorMessage);
+          
+          // Try one more fallback method
+          try {
+            window.open(blobUrl, '_blank');
+          } catch (fallbackErr) {
+            console.error("Fallback also failed:", fallbackErr);
+          }
+        }
+        
+        // Clean up the blob URL after some time
         setTimeout(() => {
           URL.revokeObjectURL(blobUrl);
         }, 60000); // 1 minute timeout
@@ -427,8 +465,7 @@ const PropertyBrochureGenerator = ({ listing }) => {
         // For desktop: Use normal download method
         doc.save(`${listing.reference || "property"}-brochure.pdf`);
       }
-
-      console.log("PDF generation complete");
+      
     } catch (err) {
       console.error("Error generating PDF:", err);
       setError("Failed to generate brochure");
