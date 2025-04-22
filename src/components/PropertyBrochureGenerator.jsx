@@ -399,20 +399,25 @@ const PropertyBrochureGenerator = ({ listing }) => {
 
       if (isMobileView) {
         console.log(window.BX);
-        
         const pdfBlob = doc.output("blob");
         const blobUrl = URL.createObjectURL(pdfBlob);
-       
-          if (typeof window.BX !== 'undefined' || window.BXMobileApp!= 'undefined') {
-            // window.BX.openExternalLink(blobUrl);
-            window.BXMobileApp.UI.Document.open({
-              url: blobUrl,
-              title: `${listing.reference || "property"}-brochure.pdf`,
-              type: 'pdf',
-            });
-            
-          } else {
-            window.open(blobUrl, '_blank'); // fallback for non-Bitrix environments
+        try{
+          
+             if (typeof window.BX !== 'undefined' || window.BXMobileApp!= 'undefined') {
+               // window.BX.openExternalLink(blobUrl);
+               window.BXMobileApp.UI.Document.open({
+                 url: blobUrl,
+                 title: `${listing.reference || "property"}-brochure.pdf`,
+                 type: 'pdf',
+               });
+               
+             } 
+        //      else {
+
+        //        window.open(blobUrl, '_blank'); // fallback for non-Bitrix environments
+        // }
+          }catch(err){
+              window.alert("error is: ", err + "bx objects: ", window.BXMobileApp," ", window.BX)
           }
         
         setTimeout(() => {
