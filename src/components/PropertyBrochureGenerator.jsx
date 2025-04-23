@@ -11,39 +11,20 @@ const PropertyBrochureGenerator = ({ listing }) => {
   const [isMobileView, setIsMobileView] = useState(false);
 
   // Check if device is mobile based on screen width
-  useEffect(() => {
-    const checkEnvironment = () => {
-      // Check screen width
-      const isSmallScreen = window.innerWidth < 768;
+    useEffect(() => {
+      const checkScreenSize = () => {
+        setIsMobileView(window.innerWidth < 768); // Consider mobile if width is less than 768px
+      };
       
-      // Check for Bitrix mobile app indicators
-      const isBitrixMobileApp = typeof window.BXMobileApp !== 'undefined' || 
-                               (typeof window.navigator !== 'undefined' && 
-                                navigator.userAgent.includes('BitrixMobile'));
+      // Set initial value
+      checkScreenSize();
       
-      // General mobile detection as fallback
-      const isMobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      // Add event listener for window resize
+      window.addEventListener('resize', checkScreenSize);
       
-      // Set mobile view if any condition is true
-      setIsMobileView(isSmallScreen || isBitrixMobileApp || isMobileUserAgent);
-      
-      // Optionally log what was detected for debugging
-      console.log({
-        isSmallScreen,
-        isBitrixMobileApp,
-        isMobileUserAgent
-      });
-    };
-  
-    // Set initial value
-    checkEnvironment();
-  
-    // Add event listener for window resize
-    window.addEventListener("resize", checkEnvironment);
-  
-    // Clean up
-    return () => window.removeEventListener("resize", checkEnvironment);
-  }, []);
+      // Clean up
+      return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
   // Improved function to convert image to base64 with better error handling
   const getBase64FromUrl = async (url) => {
@@ -416,51 +397,54 @@ const PropertyBrochureGenerator = ({ listing }) => {
       }
 
       if (isMobileView) {
-        const pdfBlob = doc.output("blob");
-        const blobUrl = URL.createObjectURL(pdfBlob);
-        
-        try {
-          // Check if we're in Bitrix mobile environment
-          if (typeof window.BXMobileApp !== 'undefined' && window.BXMobileApp.UI && window.BXMobileApp.UI.Document) {
-            // Use Bitrix mobile document viewer
-            window.BXMobileApp.UI.Document.open({
-              url: blobUrl,
-              title: `${listing.reference || "property"}-brochure.pdf`,
-              type: 'pdf',
-            });
-            console.log("Opened PDF with BXMobileApp");
-          } else if (typeof window.BX !== 'undefined' && window.BX.openExternalLink) {
-            // Try older Bitrix method
-            window.BX.openExternalLink(blobUrl);
-            console.log("Opened PDF with BX.openExternalLink");
-          } else {
-            // General mobile fallback - create a temporary download link
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = `${listing.reference || "property"}-brochure.pdf`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            console.log("Used fallback download method");
-          }
-        } catch (err) {
-          console.error("PDF download error:", err);
-          // More user-friendly error message
-          const errorMessage = `Unable to download PDF: ${err.message}`;
-          alert(errorMessage);
+        <div className="bg-blue-600 text-white h-8 w-fit p-2">
           
-          // Try one more fallback method
-          try {
-            window.open(blobUrl, '_blank');
-          } catch (fallbackErr) {
-            console.error("Fallback also failed:", fallbackErr);
-          }
-        }
+        </div>
+        // const pdfBlob = doc.output("blob");
+        // const blobUrl = URL.createObjectURL(pdfBlob);
         
-        // Clean up the blob URL after some time
-        setTimeout(() => {
-          URL.revokeObjectURL(blobUrl);
-        }, 60000); // 1 minute timeout
+        // try {
+        //   // Check if we're in Bitrix mobile environment
+        //   if (typeof window.BXMobileApp !== 'undefined' && window.BXMobileApp.UI && window.BXMobileApp.UI.Document) {
+        //     // Use Bitrix mobile document viewer
+        //     window.BXMobileApp.UI.Document.open({
+        //       url: blobUrl,
+        //       title: `${listing.reference || "property"}-brochure.pdf`,
+        //       type: 'pdf',
+        //     });
+        //     console.log("Opened PDF with BXMobileApp");
+        //   } else if (typeof window.BX !== 'undefined' && window.BX.openExternalLink) {
+        //     // Try older Bitrix method
+        //     window.BX.openExternalLink(blobUrl);
+        //     console.log("Opened PDF with BX.openExternalLink");
+        //   } else {
+        //     // General mobile fallback - create a temporary download link
+        //     const link = document.createElement('a');
+        //     link.href = blobUrl;
+        //     link.download = `${listing.reference || "property"}-brochure.pdf`;
+        //     document.body.appendChild(link);
+        //     link.click();
+        //     document.body.removeChild(link);
+        //     console.log("Used fallback download method");
+        //   }
+        // } catch (err) {
+        //   console.error("PDF download error:", err);
+        //   // More user-friendly error message
+        //   const errorMessage = `Unable to download PDF: ${err.message}`;
+        //   alert(errorMessage);
+          
+        //   // Try one more fallback method
+        //   try {
+        //     window.open(blobUrl, '_blank');
+        //   } catch (fallbackErr) {
+        //     console.error("Fallback also failed:", fallbackErr);
+        //   }
+        // }
+        
+        // // Clean up the blob URL after some time
+        // setTimeout(() => {
+        //   URL.revokeObjectURL(blobUrl);
+        // }, 60000); // 1 minute timeout
       } else {
         // For desktop: Use normal download method
         doc.save(`${listing.reference || "property"}-brochure.pdf`);
@@ -475,23 +459,42 @@ const PropertyBrochureGenerator = ({ listing }) => {
   };
 
   return (
-    <button
-      onClick={generatePDF}
-      disabled={loading || !listing}
-      className={`
-        flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
-        ${
-          loading || !listing
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer"
-        }
-        transition duration-150 font-medium
-      `}
-    >
-      <Download size={16} />
-      {loading ? "Generating..." : "Brochure"}
-    </button>
+    <>
+      {isMobileView ? (
+        <a
+          href={`https://ec2-gicrm.ae/gi-inventory-pdf-handler/?id=${listing?.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`
+            flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
+            border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer
+            transition duration-150 font-medium
+          `}
+        >
+          <Download size={16} />
+          Brochure
+        </a>
+      ) : (
+        <button
+          onClick={generatePDF}
+          disabled={loading || !listing}
+          className={`
+            flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
+            ${
+              loading || !listing
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer"
+            }
+            transition duration-150 font-medium
+          `}
+        >
+          <Download size={16} />
+          {loading ? "Generating..." : "Brochure"}
+        </button>
+      )}
+    </>
   );
-};
+
+}
 
 export default PropertyBrochureGenerator;
