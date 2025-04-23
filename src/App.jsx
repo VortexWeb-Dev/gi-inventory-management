@@ -9,13 +9,13 @@ function App() {
       <>
         {/* Header */}
         <div className="backdrop-blur-md rounded-xl p-2">
-          <div className="container mx-auto flex flex-row items-center justify-between px-2">
+          <div className="container mx-auto flex-col  md:flex-row items-center justify-between px-2">
             {/* Logo */}
             <div className="mb-4 md:mb-0 mr-4">
               <img
-                src="gi_logo.jpg"
+                src="logo_name.png"
                 alt="GI Inventory Logo"
-                className="h-8 md:h-16 object-contain rounded shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="h-14 md:h-20 object-contain rounded shadow-sm hover:shadow-md transition-shadow duration-300"
               />
             </div>
 
