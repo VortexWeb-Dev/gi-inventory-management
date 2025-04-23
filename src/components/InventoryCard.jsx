@@ -107,7 +107,7 @@ const PropertyCard = ({ property }) => {
               )}
               <span className="mb-1">Area: {property.size} sqft</span>
             </div>
-            <p className="text-sm text-blue-600 mb-2">{property.title}</p>
+            <p className="text-sm text-[#1c783f] mb-2">{property.title}</p>
             <p className="text-sm text-gray-700">
               <MapPin className="h-4 w-4 mr-1 inline-block align-middle" />
               PF: {property.locationPf}
@@ -135,7 +135,7 @@ const PropertyCard = ({ property }) => {
                 href={property.ownerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm font-semibold text-blue-600 underline "
+                className="text-sm font-semibold text-[#1c783f] underline "
               >
                {property.ownerName}
               </a>

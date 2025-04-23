@@ -468,7 +468,7 @@ const PropertyBrochureGenerator = ({ listing }) => {
           className={`
             flex items-center gap-1 px-2.5 py-1.5 rounded-md text-sm
             border border-[#0c372a] text-gray-600 hover:bg-green-100 cursor-pointer
-            transition duration-150 font-medium
+            transition duration-150 font-medium w-fit
           `}
         >
           <Download size={16} />

@@ -329,7 +329,7 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
           <button
             type="button"
             onClick={handleRefresh}
-            className="bg-orange-600 h-11 w-11 hover:bg-orange-700 hover:cursor-pointer text-white font-semibold rounded-md flex items-center justify-center"
+            className="bg-[#2abd69] h-11 w-11 hover:bg-green-600 hover:cursor-pointer text-white font-semibold rounded-md flex items-center justify-center"
           >
             <RefreshCcw
               className={`h-5 w-5 ${isSpinning ? "animate-spin" : ""}`}
@@ -339,7 +339,7 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
           <button
             type="button"
             onClick={handleFilterClick}
-            className="bg-blue-600 h-11 hover:bg-blue-700 hover:cursor-pointer text-white font-semibold py-2 px-5 text-sm rounded-md" // Adjusted Find button style
+            className="bg-[#1c6638] h-11 hover:bg-[#0C372A] hover:cursor-pointer text-white font-semibold py-2 px-5 text-sm rounded-md" // Adjusted Find button style
           >
             Search
           </button>
