@@ -7,7 +7,8 @@ import {
   Dot,
   ChevronLeft,
   ChevronRight,
-  Bath
+  Bath,
+  BedSingle,
 } from "lucide-react";
 import PropertyBrochureGenerator from "./PropertyBrochureGenerator";
 
@@ -30,19 +31,17 @@ const PropertyCard = ({ property }) => {
     <div className="md:flex bg-white rounded-lg shadow-md overflow-hidden my-4 w-[100%]">
       {/* Image Section - Full width and more square on mobile, 42% width on desktop */}
       <div className="w-full h-54 md:h-80 md:h-auto md:w-[42%] relative">
-
-
-       {property.images[mainImageIndex]?.url ? (
-    <img
-      src={property.images[mainImageIndex].url}
-      alt={property.title}
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <div className="w-full h-54 md:h-80 bg-blue-100 flex items-center justify-center">
-      <span className="text-blue-800 text-xl">NO IMAGE AVAILABLE</span>
-    </div>
-  )}
+        {property.images[mainImageIndex]?.url ? (
+          <img
+            src={property.images[mainImageIndex].url}
+            alt={property.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-54 md:h-80 bg-blue-100 flex items-center justify-center">
+            <span className="text-blue-800 text-xl">NO IMAGE AVAILABLE</span>
+          </div>
+        )}
 
         {property.images.length > 1 && (
           <>
@@ -75,7 +74,7 @@ const PropertyCard = ({ property }) => {
               AED {property.price}
             </span>
           </div>
-          
+
           {/* Status indicator */}
           {property.status === "Published" ? (
             <div className="absolute top-2 right-2 text-green-800 text-xs font-semibold px-1 py-1 rounded">
@@ -95,8 +94,20 @@ const PropertyCard = ({ property }) => {
               <span className="mr-3 mb-1">{property.unitType}</span>
               {property.bedrooms && (
                 <span className="mr-3 mb-1 flex items-center">
-                  <BedDouble className="w-5 h-5 mr-1" />
-                  {property.bedrooms} Bedrooms
+                  <span className="flex items-center">
+                    {property.bedrooms == 0 ? (
+                      <>
+                        <BedSingle className="w-5 h-5 mr-1" />
+                        Studio
+                      </>
+                    ) : (
+                      <>
+                        <BedDouble className="w-5 h-5 mr-1" />
+                        {property.bedrooms} Bedroom
+                        {property.bedrooms > 1 ? "s" : ""}
+                      </>
+                    )}
+                  </span>
                 </span>
               )}
               {property.bathrooms && (
@@ -114,12 +125,10 @@ const PropertyCard = ({ property }) => {
               <br />
               <MapPin className="h-4 w-4 mr-1 inline-block align-middle" />
               Bayut: {property.locationBayut}
-              
             </p>
-               <div className="mt-4">
-                <PropertyBrochureGenerator listing={property} />
-              </div>
-              
+            <div className="mt-4">
+              <PropertyBrochureGenerator listing={property} />
+            </div>
           </div>
         </div>
 
@@ -127,20 +136,17 @@ const PropertyCard = ({ property }) => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-3">
           <div>
             <div className="flex items-center">
-              <div className="text-sm">
-              Listing Owner:  &nbsp;
-              </div>
-            
+              <div className="text-sm">Listing Owner: &nbsp;</div>
+
               <a
                 href={property.ownerUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm font-semibold text-[#1c783f] underline "
               >
-               {property.ownerName}
+                {property.ownerName}
               </a>
             </div>
-            
           </div>
 
           <div className="flex space-x-2">

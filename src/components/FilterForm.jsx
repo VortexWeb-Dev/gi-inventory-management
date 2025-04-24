@@ -242,7 +242,7 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh}) => {
                 // Render placeholder differently if needed, or skip empty string option text
                 option === "" ? null : (
                   <option key={option} value={option}>
-                    {option}
+                    {option==0? "Studio" :option}
                   </option>
                 )
               )}
