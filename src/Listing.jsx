@@ -4,10 +4,13 @@ import Searchbar from "./components/SearchBar";
 import Pagination from "./Pagination";
 import fetchAllData from "./utils/fetchAllData";
 import FilterForm from "./components/FilterForm";
+import calculateRanges from "./utils/calculateRange";
 
 const Listing = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [propertiesData, setPropertiesData] = useState([]);
+  const [areaRange, setAreaRange] = useState([0,0])
+  const [priceRange, setPriceRange] = useState([0,0])
   const [refresh, setRefresh] = useState(0);
   const [filteredData, setFilteredData] = useState(propertiesData);
 
@@ -41,6 +44,16 @@ const Listing = () => {
   }, [refresh]);
 
  
+  useEffect(()=>{
+
+    const { priceRange: fullPrice, areaRange: fullArea } = calculateRanges("full", propertiesData);
+
+    console.log("price: ",fullPrice);
+    console.log("area: ",fullArea);
+    
+    setAreaRange(fullArea)
+    setPriceRange(fullPrice)
+  },[propertiesData])
 
   useEffect(() => {
     propertiesData &&
@@ -61,7 +74,7 @@ const Listing = () => {
     <>
     
       <div className="mx-auto">
-        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} refresh={refresh} setRefresh={setRefresh} />
+        <FilterForm filteredData={filteredData} setFilteredData={setFilteredData} refresh={refresh} setRefresh={setRefresh} fullAreaRange={areaRange} fullPriceRange={priceRange} />
 
         {propertiesData && (propertiesData.length > 0)? (
           <div>

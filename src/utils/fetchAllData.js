@@ -29,6 +29,7 @@ const fetchAllData = async () => {
       break;
     }
   }
+  console.log(aggregateData);
   
   return aggregateData;
 };

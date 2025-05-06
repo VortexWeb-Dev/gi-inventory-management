@@ -8,22 +8,6 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Function to filter locations based on search searchTerm
-  // useEffect(() => {
-  //   if (searchTerm.trim() === "") {
-  //     setSuggestions([]);
-  //     return;
-  //   }
-
-  //   const filteredLocations = locations.filter((location) =>
-  //     location.toLowerCase().includes(searchTerm.toLowerCase())
-  //   );
-
-  //   setSuggestions(filteredLocations);
-  // }, [searchTerm, locations]);
-
-
-
   const [fuseInstance, setFuseInstance] = useState(null);
   
   // Initialize Fuse instance once when locations change
@@ -63,11 +47,7 @@ const AutocompleteSearch = ({ locations, savedProperty, setProperty, searchTerm,
   .sort((a, b) => b.score - a.score);
       
       setSuggestions(fuzzyResults);
-      
-      // Debug - log results with scores to understand matches
-      // console.log('Search results with scores:', 
-      //   fuzzyResults
-      // );
+
     } catch (error) {
       console.error('Error performing fuzzy search:', error);
       setSuggestions([]);

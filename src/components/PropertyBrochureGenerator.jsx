@@ -400,51 +400,7 @@ const PropertyBrochureGenerator = ({ listing }) => {
         <div className="bg-blue-600 text-white h-8 w-fit p-2">
           
         </div>
-        // const pdfBlob = doc.output("blob");
-        // const blobUrl = URL.createObjectURL(pdfBlob);
         
-        // try {
-        //   // Check if we're in Bitrix mobile environment
-        //   if (typeof window.BXMobileApp !== 'undefined' && window.BXMobileApp.UI && window.BXMobileApp.UI.Document) {
-        //     // Use Bitrix mobile document viewer
-        //     window.BXMobileApp.UI.Document.open({
-        //       url: blobUrl,
-        //       title: `${listing.reference || "property"}-brochure.pdf`,
-        //       type: 'pdf',
-        //     });
-        //     console.log("Opened PDF with BXMobileApp");
-        //   } else if (typeof window.BX !== 'undefined' && window.BX.openExternalLink) {
-        //     // Try older Bitrix method
-        //     window.BX.openExternalLink(blobUrl);
-        //     console.log("Opened PDF with BX.openExternalLink");
-        //   } else {
-        //     // General mobile fallback - create a temporary download link
-        //     const link = document.createElement('a');
-        //     link.href = blobUrl;
-        //     link.download = `${listing.reference || "property"}-brochure.pdf`;
-        //     document.body.appendChild(link);
-        //     link.click();
-        //     document.body.removeChild(link);
-        //     console.log("Used fallback download method");
-        //   }
-        // } catch (err) {
-        //   console.error("PDF download error:", err);
-        //   // More user-friendly error message
-        //   const errorMessage = `Unable to download PDF: ${err.message}`;
-        //   alert(errorMessage);
-          
-        //   // Try one more fallback method
-        //   try {
-        //     window.open(blobUrl, '_blank');
-        //   } catch (fallbackErr) {
-        //     console.error("Fallback also failed:", fallbackErr);
-        //   }
-        // }
-        
-        // // Clean up the blob URL after some time
-        // setTimeout(() => {
-        //   URL.revokeObjectURL(blobUrl);
-        // }, 60000); // 1 minute timeout
       } else {
         // For desktop: Use normal download method
         doc.save(`${listing.reference || "property"}-brochure.pdf`);
