@@ -612,6 +612,33 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
         setSearchTerm={setSearchTerm}
       />
 
+      {/* Range Filters */}
+      
+      <div className="md:flex p-4 sm:p-6 w-full max-w-full mx-auto bg-white rounded-xl shadow-md">
+        <RangeFilter
+          range={areaRange}
+          interval={5}
+          fromValue={fromArea}
+          setFromValue={setFromArea}
+          toValue={toArea}
+          setToValue={setToArea}
+          label={"Area"}
+          unit={"sqft."}
+          fullRange={fullAreaRange}
+        />
+        <RangeFilter
+          range={priceRange}
+          interval={100000}
+          fromValue={fromPrice}
+          setFromValue={setFromPrice}
+          toValue={toPrice}
+          setToValue={setToPrice}
+          label={"Price"}
+          unit={"AED"}
+          fullRange={fullPriceRange}
+        />
+      </div>
+
       {/* Container for Filters and Buttons */}
       {/* Using flex-col on mobile and flex-row on desktop */}
       <div className="bg-white bg-opacity-90 rounded-lg shadow p-4 w-full max-w-[85%] mx-auto flex flex-col md:flex-row md:items-center md:gap-3">
@@ -760,30 +787,6 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
         </div>
       </div>
 
-      <div className="md:flex p-4 sm:p-6 w-full max-w-full mx-auto bg-white rounded-xl shadow-md">
-        <RangeFilter
-          range={areaRange}
-          interval={5}
-          fromValue={fromArea}
-          setFromValue={setFromArea}
-          toValue={toArea}
-          setToValue={setToArea}
-          label={"Area"}
-          unit={"sqft."}
-          fullRange={fullAreaRange}
-        />
-        <RangeFilter
-          range={priceRange}
-          interval={100000}
-          fromValue={fromPrice}
-          setFromValue={setFromPrice}
-          toValue={toPrice}
-          setToValue={setToPrice}
-          label={"Price"}
-          unit={"AED"}
-          fullRange={fullPriceRange}
-        />
-      </div>
     </div>
   );
 };
