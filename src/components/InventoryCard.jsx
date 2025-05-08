@@ -44,7 +44,7 @@ const PropertyCard = ({ property }) => {
         )}
         {property.unitType && (
   <div className="absolute top-2 right-2 bg-white text-black text-xs font-semibold px-2 py-1 rounded shadow">
-    {property.unitType}
+    {property.offeringType}
   </div>
 )}
 
@@ -97,7 +97,8 @@ const PropertyCard = ({ property }) => {
           <div className="text-left">
             {/* Property details with responsive wrapping */}
             <div className="flex flex-wrap items-center text-sm text-gray-600 mb-2">
-              
+            
+              <span className="mr-3 mb-1">{property.unitType}</span>
 
               {property.bedrooms && (
                 <span className="mr-3 mb-1 flex items-center">
@@ -125,7 +126,8 @@ const PropertyCard = ({ property }) => {
               )}
               <span className="mb-1">Area: {property.size} sqft</span>
             </div>
-            <p className="text-sm text-[#1c783f] mb-2">{property.title}</p>
+            <p className="text-md text-[#1c783f] mb-2">{property.title}</p>
+            <p className="text-md text-gray-800 mb-2">Status: {" "}{property.projectStatus ? property.projectStatus : "N/A"}</p>
             <p className="text-sm text-gray-700">
               <MapPin className="h-4 w-4 mr-1 inline-block align-middle" />
               PF: {property.locationPf}

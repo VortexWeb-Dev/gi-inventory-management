@@ -408,6 +408,8 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
     "Short Term / Hotel Apartment",
   ]);
   const [statusArray, setStatusArray] = useState(["", "Published", "Pocketed"]);
+  const [offeringArray, setOfferingArray] = useState(["", "Rent", "Sale"]);
+  const [projectStatusArray, setProjectStatusArray] = useState(["", "Off Plan", "Off-Plan Primary", "Off-Plan Secondary", "Ready Primary", "Ready Secondary", "Completed"]);
   const [ownerArray, setOwnerArray] = useState([""]);
   const [isSpinning, setIsSpinning] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 0]);
@@ -466,6 +468,16 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
         savedFilteredData.current.map((item) => item?.status).filter(Boolean)
       ),
     ]);
+    setOfferingArray([
+      ...new Set(
+        savedFilteredData.current.map((item) => item?.offeringType).filter(Boolean)
+      ),
+    ]);
+    setProjectStatusArray([
+      ...new Set(
+        savedFilteredData.current.map((item) => item?.projectStatus).filter(Boolean)
+      ),
+    ]);
   }, [filteredData]); // Depend only on filteredData
 
   useEffect(() => {
@@ -493,6 +505,8 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
     bathrooms: "",
     unitType: "",
     status: "",
+    offeringType: "",
+    projectStatus: ""
   });
 
   // Handle input changes for both text and select
@@ -551,6 +565,8 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
       bathrooms: "",
       unitType: "",
       status: "",
+      offeringType: "",
+      projectStatus: ""
     });
     setSearchTerm(""); // Reset search term as well
     
@@ -574,6 +590,8 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
       bathrooms: "",
       unitType: "",
       status: "",
+      offeringType: "",
+      projectStatus: ""
     });
     setSearchTerm("");
 
@@ -598,6 +616,8 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
     { name: "bathrooms", label: "Bath", options: bathArray },
     { name: "unitType", label: "Unit Type (Default)", options: unitTypeArray },
     { name: "status", label: "Status (Default)", options: statusArray },
+    { name: "offeringType", label: "Offering Type (Default)", options: offeringArray },
+    { name: "projectStatus", label: "Project Status (Default)", options: projectStatusArray },
   ];
 
   return (
@@ -754,6 +774,55 @@ const FilterBar = ({ filteredData, setFilteredData, setRefresh, fullPriceRange, 
               )}
             </select>
           </div>
+
+          {/* Offering Type (Dropdown) */}
+          {/* Mobile: Takes 1/2 width */}
+          <div className="col-span-3">
+            <select
+              name={selectFilters[4].name}
+              value={filters[selectFilters[4].name]}
+              onChange={handleInputChange}
+              className={
+                getInputStyle(selectFilters[4].name) +
+                " bg-white appearance-none"
+              }
+            >
+              <option value="">{selectFilters[4].label}</option>{" "}
+              {/* Placeholder */}
+              {selectFilters[4].options.map((option) =>
+                option === "" ? null : (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
+          {/* Project Status (Dropdown) */}
+          {/* Mobile: Takes 1/2 width */}
+          <div className="col-span-3">
+            <select
+              name={selectFilters[5].name}
+              value={filters[selectFilters[5].name]}
+              onChange={handleInputChange}
+              className={
+                getInputStyle(selectFilters[5].name) +
+                " bg-white appearance-none"
+              }
+            >
+              <option value="">{selectFilters[5].label}</option>{" "}
+              {/* Placeholder */}
+              {selectFilters[5].options.map((option) =>
+                option === "" ? null : (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
         </div>
 
         {/* Buttons Container */}
