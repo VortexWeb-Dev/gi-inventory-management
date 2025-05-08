@@ -42,6 +42,12 @@ const PropertyCard = ({ property }) => {
             <span className="text-blue-800 text-xl">NO IMAGE AVAILABLE</span>
           </div>
         )}
+        {property.unitType && (
+  <div className="absolute top-2 right-2 bg-white text-black text-xs font-semibold px-2 py-1 rounded shadow">
+    {property.unitType}
+  </div>
+)}
+
 
         {property.images.length > 1 && (
           <>
@@ -91,7 +97,8 @@ const PropertyCard = ({ property }) => {
           <div className="text-left">
             {/* Property details with responsive wrapping */}
             <div className="flex flex-wrap items-center text-sm text-gray-600 mb-2">
-              <span className="mr-3 mb-1">{property.unitType}</span>
+              
+
               {property.bedrooms && (
                 <span className="mr-3 mb-1 flex items-center">
                   <span className="flex items-center">
