@@ -1,30 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 
-const RangeFilter = ({ range = [0, 100], interval = 1, fromValue, setFromValue, toValue, setToValue, label, unit, fullRange}) => {
+const RangeFilter = ({ range = [0, 100], interval = 1, fromValue, setFromValue, toValue, setToValue, label, unit, fullRange, refresh}) => {
   const [fullMin, fullMax] = fullRange
   console.log("range: ",range);
   console.log("fullRange: ",fullRange);
   
-  const hasInitialized = useRef(false);
-  const [localFromValue, setLocalFromValue] = useState(fromValue)
-  const [localToValue, setLocalToValue] = useState(toValue)
-
-  useEffect(() => {
-    if (!hasInitialized.current) {
-      setLocalFromValue(fromValue);
-      setLocalToValue(toValue);
-      hasInitialized.current = true;
-    }
-  }, [fromValue, toValue]);
 
   const [min, max] = range;
  
   const [isInvalid, setIsInvalid] = useState(false);
 
+  useEffect(()=>{
+    setFromValue(fullRange[0])
+    setToValue(fullRange[1])
+  },[setFromValue, setToValue,refresh, fullRange])
   
   useEffect(() => {
     // Validate range whenever values change
-    // setLocalFromValue(from)
     setIsInvalid(fromValue > toValue);
   }, [fromValue, toValue]);
 
@@ -33,11 +25,9 @@ const RangeFilter = ({ range = [0, 100], interval = 1, fromValue, setFromValue, 
     if (!isNaN(value)) {
       // Allow free editing without restrictions
       setFromValue(value);
-      setLocalFromValue(value)
     } else if (e.target.value === '') {
       // Allow clearing the input
       setFromValue('');
-      setLocalFromValue('')
     }
   };
 
@@ -46,11 +36,11 @@ const RangeFilter = ({ range = [0, 100], interval = 1, fromValue, setFromValue, 
     if (!isNaN(value)) {
       // Allow free editing without restrictions
       setToValue(value);
-      setLocalToValue(value)
+      
     } else if (e.target.value === '') {
       // Allow clearing the input
       setToValue('');
-      setLocalToValue('')
+      
     }
   };
 
@@ -157,7 +147,6 @@ const RangeFilter = ({ range = [0, 100], interval = 1, fromValue, setFromValue, 
 
       <div className="mt-2 text-sm text-gray-500">
        Full Range: {fullMin}{" "}{unit} - {fullMax}{" "}{unit}
-        {/* , Interval: {interval} */}
       </div>
     </div>
   );

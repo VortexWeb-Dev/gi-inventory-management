@@ -100,6 +100,9 @@ const PropertyCard = ({ property }) => {
             
               <span className="mr-3 mb-1">{property.unitType}</span>
 
+            { 
+            !property.unitType.toLowerCase().includes("residen") &&
+              <>
               {property.bedrooms && (
                 <span className="mr-3 mb-1 flex items-center">
                   <span className="flex items-center">
@@ -124,6 +127,9 @@ const PropertyCard = ({ property }) => {
                   {property.bathrooms} Bathrooms
                 </span>
               )}
+
+              </>
+              }
               <span className="mb-1">Area: {property.size} sqft</span>
             </div>
             <p className="text-md text-[#1c783f] mb-2">{property.title}</p>
