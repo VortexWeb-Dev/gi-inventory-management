@@ -55,33 +55,47 @@ const FilterBar = ({
     hasRun.current = true;
     // Extract locations for AutocompleteSearch after saving initial data
     // Ensure item.locationBayut exists before mapping
-    
-    const allLocations = savedFilteredData.current.flatMap((item) => {
-      const { locationPf, locationBayut } = item || {};
-      const locations = [];
 
-      // If both exist and are the same, process only once
+    const locationMap = new Map();
+
+    savedFilteredData.current.forEach((item) => {
+      const { locationPf, locationBayut } = item || {};
+
+      const processLocation = (loc) => {
+        if (!loc) return;
+
+        const trimmed = loc.trim();
+        const parts = trimmed.split(" - ").map((p) => p.trim());
+
+        // Add individual parts
+        parts.forEach((part) => {
+          const key = part.toLowerCase();
+          if (!locationMap.has(key)) {
+            locationMap.set(key, part); // store original casing
+          }
+        });
+
+        // Add full location
+        const fullKey = trimmed.toLowerCase();
+        if (!locationMap.has(fullKey)) {
+          locationMap.set(fullKey, trimmed);
+        }
+      };
+
       if (
         locationPf &&
         locationBayut &&
         locationPf.trim() === locationBayut.trim()
       ) {
-        const parts = locationPf.split(" - ").map((p) => p.trim());
-        locations.push(...parts, locationPf.trim());
+        processLocation(locationPf);
       } else {
-        // Process each separately if they are different
-        [locationPf, locationBayut].forEach((loc) => {
-          if (loc) {
-            const parts = loc.split(" - ").map((p) => p.trim());
-            locations.push(...parts, loc.trim());
-          }
-        });
+        [locationPf, locationBayut].forEach(processLocation);
       }
-
-      return locations;
     });
 
-    setLocationsArray([...new Set(allLocations)]);
+    setLocationsArray([...locationMap.values()]);
+
+    // setLocationsArray([...new Set(allLocations)]);
 
     setBedArray(
       [
